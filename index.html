@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lietuvos Orų Prognozė</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gradient-1: #667eea;
+            --gradient-2: #764ba2;
+            --gradient-3: #f093fb;
+            --gradient-4: #f5576c;
+            --accent-cyan: #00d4ff;
+            --accent-orange: #ff6b35;
+            --accent-purple: #a78bfa;
+            --accent-pink: #ec4899;
+            --text-light: #ffffff;
+            --text-muted: #cbd5e1;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), var(--gradient-4));
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.05) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 50%, var(--accent-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.03em;
+            text-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+            border-radius: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-top: 1.5rem;
+        }
+
+        /* City Selector */
+        .city-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            animation: slideInFromLeft 0.8s ease-out 0.2s backwards;
+        }
+
+        .city-btn {
+            padding: 1rem 2.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            color: var(--text-light);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .city-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .city-btn:hover::before {
+            left: 100%;
+        }
+
+        .city-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .city-btn.active {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-color: transparent;
+            box-shadow: 0 15px 35px rgba(0, 212, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            animation: slideInFromRight 0.8s ease-out 0.3s backwards;
+        }
+
+        .control-btn {
+            padding: 1rem 2rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            color: var(--text-light);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+        }
+
+        .spinner {
+            width: 100%;
+            height: 100%;
+            border: 6px solid rgba(255, 255, 255, 0.1);
+            border-top: 6px solid var(--accent-cyan);
+            border-right: 6px solid var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Main Weather Card */
+        .weather-main-card {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border-radius: 40px;
+            padding: 4rem;
+            margin-bottom: 3rem;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            animation: scaleIn 0.8s ease-out 0.4s backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .weather-main-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            animation: float 25s ease-in-out infinite;
+        }
+
+        .current-weather-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .temp-section {
+            position: relative;
+        }
+
+        .city-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .temperature-display {
+            font-size: clamp(5rem, 12vw, 9rem);
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            display: inline-block;
+            text-shadow: 0 0 80px rgba(255, 255, 255, 0.5);
+        }
+
+        .weather-desc {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .icon-section {
+            text-align: center;
+            position: relative;
+        }
+
+        .main-weather-icon {
+            font-size: 12rem;
+            filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.5));
+            animation: float 6s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* Detailed Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 5px 15px rgba(0, 212, 255, 0.3));
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+            background: linear-gradient(135deg, var(--text-light), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-unit {
+            font-size: 1rem;
+            margin-left: 0.3rem;
+            opacity: 0.7;
+        }
+
+        /* UV Index special styling */
+        .uv-low { color: #4ade80 !important; }
+        .uv-moderate { color: #fbbf24 !important; }
+        .uv-high { color: #f97316 !important; }
+        .uv-very-high { color: #ef4444 !important; }
+        .uv-extreme { color: #dc2626 !important; }
+
+        /* 5-Day Forecast */
+        .forecast-section {
+            margin-top: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+        }
+
+        .forecast-card {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border-radius: 30px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border: 2px solid var(--glass-border);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeInUp 0.8s ease-out backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .forecast-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+        }
+
+        .forecast-card:hover::before {
+            top: 100%;
+            left: 100%;
+        }
+
+        .forecast-card:nth-child(1) { animation-delay: 0.5s; }
+        .forecast-card:nth-child(2) { animation-delay: 0.6s; }
+        .forecast-card:nth-child(3) { animation-delay: 0.7s; }
+        .forecast-card:nth-child(4) { animation-delay: 0.8s; }
+        .forecast-card:nth-child(5) { animation-delay: 0.9s; }
+
+        .forecast-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-purple);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .forecast-day-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .forecast-date {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .forecast-icon {
+            font-size: 5rem;
+            margin: 1.5rem 0;
+            filter: drop-shadow(0 10px 25px rgba(0, 212, 255, 0.3));
+            animation: pulse 3s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .forecast-temps {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .temp-max, .temp-min {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .temp-max {
+            color: var(--accent-orange);
+        }
+
+        .temp-min {
+            color: var(--accent-cyan);
+        }
+
+        .forecast-description {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-top: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .forecast-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .forecast-detail-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.75rem;
+            border-radius: 15px;
+        }
+
+        /* Last Update */
+        .last-update {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-muted);
+            font-size: 1rem;
+            animation: fadeInUp 1s ease-out 1s backwards;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Error */
+        .error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            border-radius: 30px;
+            padding: 3rem;
+            text-align: center;
+            color: #fecaca;
+            margin: 2rem 0;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .error h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .current-weather-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .icon-section {
+                order: -1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .weather-main-card {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+
+            .city-selector {
+                gap: 0.5rem;
+            }
+
+            .city-btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .forecast-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <header>
+            <h1>Lietuvos Orai</h1>
+            <div class="subtitle">Tiksli prognozė kiekvienam miestui</div>
+        </header>
+
+        <!-- City Selector -->
+        <div class="city-selector" id="citySelector"></div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="control-btn" onclick="updateWeather()">
+                <span>🔄</span>
+                <span>Atnaujinti</span>
+            </button>
+            <button class="control-btn" onclick="toggleAutoUpdate()">
+                <span>⏱️</span>
+                <span id="autoUpdateText">Įjungti Auto</span>
+            </button>
+        </div>
+
+        <!-- Weather Content -->
+        <div id="weatherContent">
+            <div class="loading">
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                </div>
+                <h2>Kraunami orų duomenys...</h2>
+            </div>
+        </div>
+
+        <div class="last-update" id="lastUpdate"></div>
+    </div>
+
+    <script>
+        // Lithuanian cities with coordinates
+        const cities = {
+            'Vilnius': { lat: 54.6872, lon: 25.2797, name: 'Vilnius' },
+            'Kaunas': { lat: 54.8985, lon: 23.9036, name: 'Kaunas' },
+            'Klaipėda': { lat: 55.7033, lon: 21.1443, name: 'Klaipėda' },
+            'Šiauliai': { lat: 55.9349, lon: 23.3144, name: 'Šiauliai' },
+            'Panevėžys': { lat: 55.7348, lon: 24.3570, name: 'Panevėžys' }
+        };
+
+        let currentCity = 'Klaipėda';
+        let autoUpdateInterval = null;
+        let isAutoUpdate = false;
+
+        const weatherIcons = {
+            '0': '☀️', '1': '🌤️', '2': '⛅', '3': '☁️',
+            '45': '🌫️', '48': '🌫️', '51': '🌦️', '53': '🌧️', '55': '🌧️',
+            '61': '🌧️', '63': '🌧️', '65': '⛈️', '71': '🌨️', '73': '🌨️',
+            '75': '❄️', '77': '🌨️', '80': '🌦️', '81': '🌧️', '82': '⛈️',
+            '85': '🌨️', '86': '❄️', '95': '⛈️', '96': '⛈️', '99': '⛈️'
+        };
+
+        const weatherDescriptions = {
+            '0': 'Giedra', '1': 'Daugiausia giedra', '2': 'Dalinai debesuota',
+            '3': 'Debesuota', '45': 'Rūkas', '48': 'Šerkšnas',
+            '51': 'Lengvas dulksna', '53': 'Vidutinis dulksna', '55': 'Smarkus dulksna',
+            '61': 'Lengvas lietus', '63': 'Vidutinis lietus', '65': 'Smarkus lietus',
+            '71': 'Lengvas sniegas', '73': 'Vidutinis sniegas', '75': 'Smarkus sniegas',
+            '77': 'Kruša', '80': 'Trumpi lietūs', '81': 'Vidutiniai lietūs',
+            '82': 'Smarkūs lietūs', '85': 'Lengvi sniego kruošos', '86': 'Smarkūs sniego kruošos',
+            '95': 'Perkūnija', '96': 'Perkūnija su kruša', '99': 'Stipri perkūnija'
+        };
+
+        const dayNames = ['Sekmadienis', 'Pirmadienis', 'Antradienis', 'Trečiadienis', 
+                          'Ketvirtadienis', 'Penktadienis', 'Šeštadienis'];
+
+        const monthNames = ['Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis',
+                           'Liepa', 'Rugpjūtis', 'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis'];
+
+        // Initialize city selector
+        function initCitySelector() {
+            const selector = document.getElementById('citySelector');
+            Object.keys(cities).forEach(city => {
+                const btn = document.createElement('button');
+                btn.className = 'city-btn';
+                btn.textContent = city;
+                if (city === currentCity) btn.classList.add('active');
+                btn.onclick = () => selectCity(city);
+                selector.appendChild(btn);
+            });
+        }
+
+        function selectCity(city) {
+            currentCity = city;
+            document.querySelectorAll('.city-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === city);
+            });
+            updateWeather();
+        }
+
+        async function fetchWeather() {
+            try {
+                const city = cities[currentCity];
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl,cloud_cover&hourly=uv_index&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,uv_index_max&timezone=Europe/Vilnius&forecast_days=5`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Nepavyko gauti orų duomenų');
+                }
+                
+                const data = await response.json();
+                displayWeather(data);
+                updateLastUpdateTime();
+            } catch (error) {
+                displayError(error.message);
+            }
+        }
+
+        function getUVIndexClass(uvIndex) {
+            if (uvIndex < 3) return 'uv-low';
+            if (uvIndex < 6) return 'uv-moderate';
+            if (uvIndex < 8) return 'uv-high';
+            if (uvIndex < 11) return 'uv-very-high';
+            return 'uv-extreme';
+        }
+
+        function getUVIndexLabel(uvIndex) {
+            if (uvIndex < 3) return 'Žemas';
+            if (uvIndex < 6) return 'Vidutinis';
+            if (uvIndex < 8) return 'Aukštas';
+            if (uvIndex < 11) return 'Labai aukštas';
+            return 'Ekstremalus';
+        }
+
+        function getWindDirection(degrees) {
+            const directions = ['Š', 'ŠR', 'R', 'PR', 'P', 'PV', 'V', 'ŠV'];
+            const index = Math.round(degrees / 45) % 8;
+            return directions[index];
+        }
+
+        function displayWeather(data) {
+            const current = data.current;
+            const daily = data.daily;
+            const hourly = data.hourly;
+
+            const currentHour = new Date().getHours();
+            const currentUV = hourly.uv_index[currentHour] || 0;
+
+            const weatherCode = current.weather_code.toString();
+            const icon = weatherIcons[weatherCode] || '🌡️';
+            const description = weatherDescriptions[weatherCode] || 'Nežinoma';
+
+            let html = `
+                <div class="weather-main-card">
+                    <div class="current-weather-grid">
+                        <div class="temp-section">
+                            <div class="city-name">📍 ${cities[currentCity].name}</div>
+                            <div class="temperature-display">${Math.round(current.temperature_2m)}°</div>
+                            <div class="weather-desc">${description}</div>
+                        </div>
+                        <div class="icon-section">
+                            <div class="main-weather-icon">${icon}</div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🌡️</div>
+                            <div class="stat-label">Jaučiama</div>
+                            <div class="stat-value">${Math.round(current.apparent_temperature)}<span class="stat-unit">°C</span></div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">💧</div>
+                            <div class="stat-label">Drėgmė</div>
+                            <div class="stat-value">${current.relative_humidity_2m}<span class="stat-unit">%</span></div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">💨</div>
+                            <div class="stat-label">Vėjas</div>
+                            <div class="stat-value">${Math.round(current.wind_speed_10m)}<span class="stat-unit">km/h</span></div>
+                            <div style="margin-top: 0.5rem; color: var(--text-muted);">${getWindDirection(current.wind_direction_10m)}</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">🌧️</div>
+                            <div class="stat-label">Krituliai</div>
+                            <div class="stat-value">${current.precipitation}<span class="stat-unit">mm</span></div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">🔆</div>
+                            <div class="stat-label">UV Indeksas</div>
+                            <div class="stat-value ${getUVIndexClass(currentUV)}">${Math.round(currentUV)}</div>
+                            <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">${getUVIndexLabel(currentUV)}</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">🌫️</div>
+                            <div class="stat-label">Debesuotumas</div>
+                            <div class="stat-value">${current.cloud_cover}<span class="stat-unit">%</span></div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-label">Slėgis</div>
+                            <div class="stat-value">${Math.round(current.pressure_msl)}<span class="stat-unit">hPa</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="forecast-section">
+                    <h2 class="section-title">5 Dienų Prognozė</h2>
+                    <div class="forecast-grid">
+            `;
+
+            for (let i = 0; i < 5; i++) {
+                const date = new Date(daily.time[i]);
+                const dayName = i === 0 ? 'Šiandien' : dayNames[date.getDay()];
+                const dateStr = `${date.getDate()} ${monthNames[date.getMonth()]}`;
+                const code = daily.weather_code[i].toString();
+                const forecastIcon = weatherIcons[code] || '🌡️';
+                const forecastDesc = weatherDescriptions[code] || 'Nežinoma';
+
+                html += `
+                    <div class="forecast-card">
+                        <div class="forecast-day-name">${dayName}</div>
+                        <div class="forecast-date">${dateStr}</div>
+                        <div class="forecast-icon">${forecastIcon}</div>
+                        <div class="forecast-temps">
+                            <div class="temp-max">${Math.round(daily.temperature_2m_max[i])}°</div>
+                            <div class="temp-min">${Math.round(daily.temperature_2m_min[i])}°</div>
+                        </div>
+                        <div class="forecast-description">${forecastDesc}</div>
+                        <div class="forecast-details">
+                            <div class="forecast-detail-item">
+                                💧 ${daily.precipitation_sum[i]} mm
+                            </div>
+                            <div class="forecast-detail-item">
+                                🌧️ ${daily.precipitation_probability_max[i]}%
+                            </div>
+                            <div class="forecast-detail-item">
+                                💨 ${Math.round(daily.wind_speed_10m_max[i])} km/h
+                            </div>
+                            <div class="forecast-detail-item">
+                                🔆 UV ${Math.round(daily.uv_index_max[i])}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div></div>';
+
+            document.getElementById('weatherContent').innerHTML = html;
+        }
+
+        function displayError(message) {
+            document.getElementById('weatherContent').innerHTML = `
+                <div class="error">
+                    <h2>⚠️ Klaida</h2>
+                    <p>${message}</p>
+                    <p>Bandykite dar kartą vėliau arba pasirinkite kitą miestą.</p>
+                </div>
+            `;
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('lt-LT', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('lt-LT', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('lastUpdate').innerHTML = `
+                <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">⏰ Paskutinis atnaujinimas</div>
+                <div style="font-size: 0.95rem; opacity: 0.8;">${dateString}</div>
+                <div style="font-size: 0.95rem; opacity: 0.8;">${timeString}</div>
+            `;
+        }
+
+        function updateWeather() {
+            document.getElementById('weatherContent').innerHTML = `
+                <div class="loading">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                    </div>
+                    <h2>Atnaujinami ${currentCity} orų duomenys...</h2>
+                </div>
+            `;
+            fetchWeather();
+        }
+
+        function toggleAutoUpdate() {
+            isAutoUpdate = !isAutoUpdate;
+            const button = document.getElementById('autoUpdateText');
+            
+            if (isAutoUpdate) {
+                button.textContent = 'Išjungti Auto';
+                autoUpdateInterval = setInterval(fetchWeather, 3600000);
+            } else {
+                button.textContent = 'Įjungti Auto';
+                if (autoUpdateInterval) {
+                    clearInterval(autoUpdateInterval);
+                    autoUpdateInterval = null;
+                }
+            }
+        }
+
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize
+        initCitySelector();
+        createParticles();
+        fetchWeather();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
